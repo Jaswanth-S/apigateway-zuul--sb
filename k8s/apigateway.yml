@@ -1,0 +1,62 @@
+#Create a deployment by using the image pushed to Docker Hub
+#containerPort has to be 8761
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apigateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8.stackroute: apigateway-deployment
+  template:
+    metadata:
+      labels:
+        k8.stackroute: apigateway-deployment
+    spec:
+      containers:
+        - name: apigateway-service
+          image: jaswanth1234/apigateway:3.0
+          env:
+            - name: SERVICEONE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: apigateway-configmap
+                  key: serviceone_path
+            - name: SERVICEONE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: apigateway-configmap
+                  key: serviceone_url
+            - name: SERVICETWO_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: apigateway-configmap
+                  key: servicetwo_path
+            - name: SERVICETWO_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: apigateway-configmap
+                  key: servicetwo_url
+          ports:
+            - containerPort: 8090
+---
+#Create the service of type LoadBalancer and use the above created deployment as selector
+#port should be 8081
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: apigateway-service
+  labels:
+    app: apigateway-service
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 31000
+      port: 8090
+      targetPort: 8090
+  selector:
+    k8.stackroute: apigateway-deployment
+

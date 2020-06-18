@@ -1,0 +1,16 @@
+# application name should be "api-gateway"
+
+server:
+   port: 8090
+spring:
+  application:
+    name: api-gateway
+
+zuul:
+  routes:
+    service_1:
+      path: ${SERVICEONE_PATH}
+      url:  ${SERVICEONE_URL}
+    service_2:
+      path:  ${SERVICETWO_PATH}
+      url:   ${SERVICETWO_URL}
